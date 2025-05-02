@@ -691,7 +691,7 @@ func (soc *Socket) Getusefd() (int, error) {
 //
 // Returns OR'ed value of options
 //
-// Returns ErrorNotImplemented3 with ZeroMQ version < 4.3
+// Returns ErrorNotImplemented43 with ZeroMQ version < 4.3
 //
 // See https://libzmq.readthedocs.io/en/latest/zmq_getsockopt.html#_zmq_router_notify_retrieve_router_socket_notification_settings
 func (soc *Socket) GetRouterNotify() (RouterNotifyOption, error) {
@@ -700,4 +700,40 @@ func (soc *Socket) GetRouterNotify() (RouterNotifyOption, error) {
 	}
 	i, err := soc.getInt(C.ZMQ_ROUTER_NOTIFY)
 	return RouterNotifyOption(i), err
+}
+
+// ZMQ_HELLO_MSG: Get the message to be sent to peers when they connect
+//
+// Returns ErrorNotImplemented433 with ZeroMQ version < 4.3.3
+//
+// See https://libzmq.readthedocs.io/en/latest/zmq_setsockopt.html#_zmq_hello_msg_set_an_hello_message_that_will_be_sent_when_a_new_peer_connect
+func (soc *Socket) GetHelloMsg() (string, error) {
+	if minor < 3 || (minor == 3 && patch < 3) {
+		return "", ErrorNotImplemented433
+	}
+	return soc.getString(C.ZMQ_HELLO_MSG, 1024)
+}
+
+// ZMQ_DISCONNECT_MSG: Get the message to be generated when accepted peers disconnect
+//
+// Returns ErrorNotImplemented433 with ZeroMQ version < 4.3.3
+//
+// See https://libzmq.readthedocs.io/en/latest/zmq_setsockopt.html#_zmq_disconnect_msg_set_a_disconnect_message_that_the_socket_will_generate_when_accepted_peer_disconnect
+func (soc *Socket) GetDisconnectMsg() (string, error) {
+	if minor < 3 || (minor == 3 && patch < 3) {
+		return "", ErrorNotImplemented433
+	}
+	return soc.getString(C.ZMQ_DISCONNECT_MSG, 1024)
+}
+
+// ZMQ_HICCUP_MSG: Get the message to be generated when connected peers temporarily disconnect
+//
+// Returns ErrorNotImplemented435 with ZeroMQ version < 4.3.5
+//
+// See https://libzmq.readthedocs.io/en/latest/zmq_setsockopt.html#_zmq_hiccup_msg_set_a_hiccup_message_that_the_socket_will_generate_when_connected_peer_temporarily_disconnect
+func (soc *Socket) GetHiccupMsg() (string, error) {
+	if minor < 3 || (minor == 3 && patch < 5) {
+		return "", ErrorNotImplemented435
+	}
+	return soc.getString(C.ZMQ_HICCUP_MSG, 1024)
 }
